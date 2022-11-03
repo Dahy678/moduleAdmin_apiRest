@@ -6,7 +6,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 
 
-
 public interface IBaseService<DTO extends BaseDto, R extends BaseResult<DTO>> {
     public ResponseEntity<DTO> save(DTO dto);
 
