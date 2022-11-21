@@ -1,5 +1,4 @@
-package com.fiuni.administrador.dto.rol;
-
+package com.fiuni.administrador.dto.dia;
 
 
 import com.fiuni.administrador.dto.base.BaseDto;
@@ -7,11 +6,14 @@ import com.fiuni.administrador.dto.base.BaseDto;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
-@XmlRootElement(name = "ROLES")
-public class RolDto extends BaseDto {
+@XmlRootElement(name = "DIAS")
+public class DiaDto extends BaseDto {
 
     private String nombre;
+
     private Boolean estado;
+
+
 
 
     @XmlElement
@@ -32,6 +34,4 @@ public class RolDto extends BaseDto {
         this.estado = estado;
     }
 
-
 }
-

@@ -1,14 +1,18 @@
 package com.fiuni.administrador.service.rol;
+
 import com.fiuni.administrador.dao.rol.IRolDao;
 import com.fiuni.administrador.dto.rol.RolDto;
 import com.fiuni.administrador.dto.rol.RolResult;
 import com.fiuni.administrador.service.base.BaseServiceImpl;
+import com.fiuni.administrador.utils.Settings;
 import com.library.domainLibrary.domain.rol.RolDomain;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.CacheManager;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+
 import javax.transaction.Transactional;
 import java.util.Optional;
 
@@ -17,6 +21,13 @@ public class RolServiceImple extends BaseServiceImpl <RolDto ,RolDomain ,RolResu
 
     @Autowired
     private IRolDao rolDao;
+
+    @Autowired
+    private CacheManager cacheManager;
+
+    private  RolDomain rolDomain;
+
+
 
 
     @Override
@@ -39,15 +50,23 @@ public class RolServiceImple extends BaseServiceImpl <RolDto ,RolDomain ,RolResu
     }
 
     @Override
+
+  //  @CachePut()
     public ResponseEntity<RolDto> save(RolDto dto) {
         dto.setEstado(dto.getEstado() == null ? true : dto.getEstado());
         RolDto response = convertDomainToDto(rolDao.save(convertDtoToDomain(dto)));
+
+
+
+
         return response != null ? new ResponseEntity<RolDto>(response, HttpStatus.CREATED)
                 : new ResponseEntity<>(HttpStatus.CONFLICT);
     }
 
     @Override
     @Transactional
+
+  //  @Cacheable(value, key ="'api_rol_'+#aafs")
     public ResponseEntity<RolDto> getById(Integer id) {
         Optional<RolDomain> rolDomainOp = rolDao.findById(id);
         RolDto response = rolDomainOp.map(rol -> {
@@ -62,12 +81,17 @@ public class RolServiceImple extends BaseServiceImpl <RolDto ,RolDomain ,RolResu
     @Transactional
     public ResponseEntity<RolResult> getAll(Pageable pageable) {
         RolResult result = new RolResult(rolDao.findAll(pageable).map(rol -> {
-            return convertDomainToDto(rol);
+            RolDto dto= convertDomainToDto(rol);
+
+            cacheManager.getCache(Settings.CACHE_NAME).putIfAbsent("api_rol_" + dto.getId(), dto);
+            return dto;
+
         }).toList());
 
         return result != null ? new ResponseEntity<RolResult>(result, HttpStatus.OK)
                 : new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
+
 
     @Override
     @Transactional
@@ -88,6 +112,10 @@ public class RolServiceImple extends BaseServiceImpl <RolDto ,RolDomain ,RolResu
 
     @Override
     @Transactional
+
+
+   // @CacheEvict(value =Settings.CACHE_NAME,allEntries=true)
+
     public ResponseEntity<Boolean> delete(Integer id) {
         Boolean response = rolDao.findById(id).map(rolDomain -> {
             RolDto dto = convertDomainToDto(rolDomain);
@@ -109,7 +137,15 @@ public class RolServiceImple extends BaseServiceImpl <RolDto ,RolDomain ,RolResu
         Integer response = rolDao.deleteAbsolut(id);
         return new ResponseEntity<Integer>(response, response > 0 ? HttpStatus.OK : HttpStatus.METHOD_NOT_ALLOWED);
     }
+
+
+   // public ResponseEntity<RolDto> login(RolDto dto) {
+
+       // return null;
+    //}
 }
+
+
 
 
 /*

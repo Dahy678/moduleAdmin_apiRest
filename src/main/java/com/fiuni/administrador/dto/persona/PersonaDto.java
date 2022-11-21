@@ -1,5 +1,7 @@
 package com.fiuni.administrador.dto.persona;
 
+
+import com.fiuni.administrador.dto.rol.RolDto;
 import com.fiuni.administrador.dto.base.BaseDto;
 
 import javax.xml.bind.annotation.XmlElement;
@@ -19,6 +21,8 @@ public class PersonaDto extends BaseDto {
     private String genero;
     private String ci;
     private Boolean estado;
+
+    private RolDto rolDto;
 
 
 
@@ -95,6 +99,11 @@ public class PersonaDto extends BaseDto {
         this.genero = genero;
     }
 
+
+    public RolDto getRolDto() {
+        return rolDto;
+    }
+
     @XmlElement
     public String getCi() {
         return ci;
@@ -114,5 +123,8 @@ public class PersonaDto extends BaseDto {
     }
 
 
+    public void setRolDto(RolDto rolDto) {
+        this.rolDto=rolDto;
+    }
 }
 

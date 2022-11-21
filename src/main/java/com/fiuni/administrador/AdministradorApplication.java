@@ -3,6 +3,8 @@ package com.fiuni.administrador;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
+import org.springframework.cache.annotation.EnableCaching;
+import org.springframework.context.annotation.ImportResource;
 
 @EntityScan({"com.library.domainLibrary.domain.base",
 		"com.library.domainLibrary.domain.ciclo",
@@ -30,6 +32,9 @@ import org.springframework.boot.autoconfigure.domain.EntityScan;
 
 
 @SpringBootApplication
+
+@ImportResource("classpath:memcached.xml")
+@EnableCaching
 public class AdministradorApplication {
 
 	public static void main(String[] args) {

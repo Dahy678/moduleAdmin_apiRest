@@ -21,37 +21,39 @@ public class RolController {
     @Autowired
     private IRolService rolService;
 
+    @CrossOrigin(origins = "*", methods= {RequestMethod.GET,RequestMethod.POST})
     @GetMapping("/{id}")
     public ResponseEntity<RolDto> getById(@PathVariable(value = "id") Integer cityId) {
         return rolService.getById(cityId);
     }
 
+    @CrossOrigin(origins = "*", methods= {RequestMethod.GET,RequestMethod.POST})
     @GetMapping(path = "/page/{page_num}")
     public ResponseEntity<RolResult> getClients(@PathVariable(value = "page_num")Integer pageNum) {
         return rolService.getAll(PageRequest.of(pageNum, Settings.PAGE_SIZE));
     }
+    @CrossOrigin(origins = "*", methods= {RequestMethod.GET,RequestMethod.POST})
     @PostMapping
     public ResponseEntity<RolDto> save(@Validated @RequestBody RolDto rol) {
         return rolService.save(rol);
     }
-
+    @CrossOrigin(origins = "*", methods= {RequestMethod.GET,RequestMethod.POST})
     @PutMapping("/{id}")
     public ResponseEntity<RolDto> putRol(@PathVariable(value = "id") Integer id, @RequestBody RolDto dto) {
         return rolService.update(id, dto);
     }
 
+    @CrossOrigin(origins = "*", methods= {RequestMethod.GET,RequestMethod.POST})
     @DeleteMapping("eliminar/{id}")
     public ResponseEntity<Boolean> deleteRol(@PathVariable(value = "id") Integer id) {
         return rolService.delete(id);
     }
 
+    @CrossOrigin(origins = "*", methods= {RequestMethod.GET,RequestMethod.POST})
     @DeleteMapping("/absolute/{id}")
     public ResponseEntity<Integer> deleteAbsRol(@PathVariable(value = "id") Integer id){
         return rolService.deleteAbs(id);
     }
-
-
-
 
 
 }
