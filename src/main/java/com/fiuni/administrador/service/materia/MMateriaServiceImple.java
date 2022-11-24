@@ -8,11 +8,14 @@ import com.fiuni.administrador.utils.Settings;
 import com.library.domainLibrary.domain.materia.MateriaDomain;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.CacheManager;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import javax.transaction.Transactional;
 import java.util.Optional;
 
@@ -20,7 +23,8 @@ import java.util.Optional;
 public class MMateriaServiceImple extends BaseServiceImpl<MateriaDTO, MateriaDomain, MateriaResult> implements IMMaterialService {
 
 
-
+    @PersistenceContext
+    private EntityManager em;
     @Autowired
     private IMateriaDao materiaDao;
 
@@ -78,19 +82,25 @@ public class MMateriaServiceImple extends BaseServiceImpl<MateriaDTO, MateriaDom
                 : new ResponseEntity(HttpStatus.NOT_FOUND);
     }
 
+
+
     @Override
     @Transactional
-    public ResponseEntity<MateriaResult> getAll(Pageable pageable) {
-        MateriaResult result = new MateriaResult(materiaDao.findAll(pageable).map(rol -> {
-            MateriaDTO dto= convertDomainToDto(rol);
+    public MateriaResult getAll(Pageable pageable) {
 
+        Page<MateriaDomain> page = materiaDao.getByEstadoTrue(pageable);
+
+
+        MateriaResult response = new MateriaResult(page.map(materia -> {
+            MateriaDTO dto = convertDomainToDto(materia);
             cacheManager.getCache(Settings.CACHE_NAME).putIfAbsent("api_materia_" + dto.getId(), dto);
             return dto;
-
         }).toList());
 
-        return result != null ? new ResponseEntity<MateriaResult>(result, HttpStatus.OK)
-                : new ResponseEntity<>(HttpStatus.NOT_FOUND);
+   //    response.setTotalPages(page.getTotalPages());
+
+
+        return response;
     }
 
 
@@ -125,5 +135,16 @@ public class MMateriaServiceImple extends BaseServiceImpl<MateriaDTO, MateriaDom
         }).orElse(null);
         return new ResponseEntity<Boolean>(response != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
     }
+
+
+
+
+
+
+
+
+
+
+
 
 }

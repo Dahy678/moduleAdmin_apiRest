@@ -6,6 +6,7 @@ import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.ImportResource;
 
+
 @EntityScan({"com.library.domainLibrary.domain.base",
 		"com.library.domainLibrary.domain.ciclo",
 		"com.library.domainLibrary.domain.clase",

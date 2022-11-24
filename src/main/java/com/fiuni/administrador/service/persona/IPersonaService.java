@@ -18,4 +18,7 @@ public interface IPersonaService extends IBaseService<PersonaDto, PersonaResult>
 
     public ResponseEntity<PersonaDto> getById(Integer id);
     // ResponseEntity<PersonaDto> login(PersonaDto persona);
+
+
+
 }

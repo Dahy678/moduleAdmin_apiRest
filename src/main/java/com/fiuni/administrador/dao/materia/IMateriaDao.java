@@ -10,6 +10,10 @@ import org.springframework.stereotype.Repository;
 public interface IMateriaDao extends CrudRepository<MateriaDomain, Integer> {
     public Page<MateriaDomain> findAll(Pageable pageable);
 
+    public Page<MateriaDomain> getByEstadoTrue(Pageable pageable);
+
+
+
 
 }
 

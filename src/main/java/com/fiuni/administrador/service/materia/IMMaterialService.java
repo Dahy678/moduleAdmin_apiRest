@@ -12,4 +12,6 @@ public interface IMMaterialService extends IBaseService<MateriaDTO, MateriaResul
     public abstract ResponseEntity<Boolean> delete(Integer id);
 
 
+
+
 }

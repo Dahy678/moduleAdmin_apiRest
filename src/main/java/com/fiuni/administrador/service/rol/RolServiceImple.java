@@ -79,7 +79,7 @@ public class RolServiceImple extends BaseServiceImpl <RolDto ,RolDomain ,RolResu
 
     @Override
     @Transactional
-    public ResponseEntity<RolResult> getAll(Pageable pageable) {
+    public RolResult getAll(Pageable pageable) {
         RolResult result = new RolResult(rolDao.findAll(pageable).map(rol -> {
             RolDto dto= convertDomainToDto(rol);
 
@@ -88,8 +88,7 @@ public class RolServiceImple extends BaseServiceImpl <RolDto ,RolDomain ,RolResu
 
         }).toList());
 
-        return result != null ? new ResponseEntity<RolResult>(result, HttpStatus.OK)
-                : new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        return result;
     }
 
 

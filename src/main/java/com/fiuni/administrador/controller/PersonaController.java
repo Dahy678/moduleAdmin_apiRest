@@ -7,6 +7,7 @@ import com.fiuni.administrador.service.persona.IPersonaService;
 import com.fiuni.administrador.utils.Settings;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -26,12 +27,26 @@ public class PersonaController {
         return personaService.getById(cityId);
     }
 
-    @CrossOrigin(origins = "*", methods= {RequestMethod.GET,RequestMethod.POST})
+   // @CrossOrigin(origins = "*", methods= {RequestMethod.GET,RequestMethod.POST})
     @GetMapping(path = "/page/{page_num}")
     public ResponseEntity<PersonaResult> getAll(@PathVariable(value = "page_num")Integer pageNum){
-        return personaService.getAll(PageRequest.of(pageNum, Settings.PAGE_SIZE));
+        PersonaResult response = personaService.getAll(PageRequest.of(pageNum, Settings.PAGE_SIZE));
+        return response != null ? new ResponseEntity<PersonaResult>(response, HttpStatus.OK)
+                : new ResponseEntity<>(HttpStatus.NOT_FOUND);
 
     }
+    /*
+    *
+     @GetMapping(path = "/page/{page_num}")
+    public ResponseEntity<MateriaResult> getAll(@PathVariable(value = "page_num")Integer pageNum){
+        MateriaResult response = materiaService.getAll(PageRequest.of(pageNum, Settings.PAGE_SIZE));
+        return response != null ? new ResponseEntity<MateriaResult>(response, HttpStatus.OK)
+                : new ResponseEntity<>(HttpStatus.NOT_FOUND);
+
+    }
+
+    *
+    * */
 
 
 

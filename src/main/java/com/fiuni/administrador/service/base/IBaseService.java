@@ -14,6 +14,8 @@ public interface IBaseService<DTO extends BaseDto, R extends BaseResult<DTO>> {
      //public ResponseEntity<DTO> login(DTO dto);
 
 
-    public ResponseEntity<R> getAll(Pageable pageable);
+    public R getAll(Pageable pageable);
+
+   // public R getAll(Pageable pageable) throws Exception;
 
 }

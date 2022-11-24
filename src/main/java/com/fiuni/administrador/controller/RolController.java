@@ -1,4 +1,5 @@
 package com.fiuni.administrador.controller;
+
 import com.fiuni.administrador.dto.rol.RolDto;
 import com.fiuni.administrador.dto.rol.RolResult;
 import com.fiuni.administrador.service.rol.IRolService;
@@ -15,7 +16,6 @@ import org.springframework.web.bind.annotation.*;
 //@CrossOrigin(origins= "*")
 
 @RequestMapping(path = "/roles")
-
 public class RolController {
 
     @Autowired
@@ -29,7 +29,7 @@ public class RolController {
 
     @CrossOrigin(origins = "*", methods= {RequestMethod.GET,RequestMethod.POST})
     @GetMapping(path = "/page/{page_num}")
-    public ResponseEntity<RolResult> getClients(@PathVariable(value = "page_num")Integer pageNum) {
+    public RolResult getClients(@PathVariable(value = "page_num")Integer pageNum) {
         return rolService.getAll(PageRequest.of(pageNum, Settings.PAGE_SIZE));
     }
     @CrossOrigin(origins = "*", methods= {RequestMethod.GET,RequestMethod.POST})

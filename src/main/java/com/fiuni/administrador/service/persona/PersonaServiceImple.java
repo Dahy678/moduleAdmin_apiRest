@@ -8,12 +8,13 @@ import com.fiuni.administrador.dto.rol.RolDto;
 import com.fiuni.administrador.service.base.BaseServiceImpl;
 import com.fiuni.administrador.utils.Settings;
 import com.library.domainLibrary.domain.persona.PersonaDomain;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.CacheManager;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.transaction.Transactional;
 
@@ -105,7 +106,7 @@ public  class PersonaServiceImple extends BaseServiceImpl<PersonaDto ,PersonaDom
 
     @Override
     @Transactional
-    //@Cacheable(value =Settings.CACHE_NAME,key="'api_persona_'+ #id")
+   // @Cacheable(value =Settings.CACHE_NAME,key="'api_persona_'+ #id")
     public ResponseEntity<PersonaDto> getById(Integer id) {
         PersonaDto response = personaDao.findById(id).map(personaDomain -> convertDomainToDto(personaDomain)).orElse(null);
 
@@ -115,18 +116,18 @@ public  class PersonaServiceImple extends BaseServiceImpl<PersonaDto ,PersonaDom
     }
     @Override
     @Transactional
-    public ResponseEntity<PersonaResult> getAll(Pageable pageable) {
+    public PersonaResult getAll(Pageable pageable) {
 
-        PersonaResult response = new PersonaResult(personaDao.findAll(pageable).map(persona -> {
-            PersonaDto dto = convertDomainToDto(persona);
+        Page<PersonaDomain> page = personaDao.getByEstadoTrue(pageable);
 
+
+        PersonaResult response = new PersonaResult(page.map(materia -> {
+            PersonaDto dto = convertDomainToDto(materia);
             cacheManager.getCache(Settings.CACHE_NAME).putIfAbsent("api_persona_" + dto.getId(), dto);
             return dto;
-
         }).toList());
 
-        return response != null ? new ResponseEntity(response, HttpStatus.OK)
-                : new ResponseEntity(HttpStatus.NOT_FOUND);
+        return response ;
     }
 
 
