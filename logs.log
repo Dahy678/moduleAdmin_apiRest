@@ -1,0 +1,11 @@
+2022-12-09 01:18:54 INFO  AdministradorApplication:54 - hello
+  2022-12-09 01:18:54 ERROR AdministradorApplication:56 - error
+  2022-12-09 01:21:14 INFO  AdministradorApplication:54 - hello
+  2022-12-09 01:21:14 ERROR AdministradorApplication:56 - error
+  2022-12-09 01:28:07 INFO  AdministradorApplication:54 - hello
+  2022-12-09 01:28:07 ERROR AdministradorApplication:56 - error
+  2022-12-09 01:28:30 INFO  AdministradorApplication:54 - hello
+  2022-12-09 01:28:30 ERROR AdministradorApplication:56 - error
+  2022-12-09 01:41:20 INFO  AdministradorApplication:54 - hello
+  2022-12-09 01:41:20 ERROR AdministradorApplication:56 - error
+  

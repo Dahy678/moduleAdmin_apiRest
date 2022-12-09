@@ -1,10 +1,17 @@
 package com.fiuni.administrador;
 
+
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
+import org.springframework.boot.builder.SpringApplicationBuilder;
+import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.ImportResource;
+
+import org.apache.log4j.Logger;
+
+import static org.apache.log4j.Logger.getLogger;
 
 
 @EntityScan({"com.library.domainLibrary.domain.base",
@@ -36,10 +43,26 @@ import org.springframework.context.annotation.ImportResource;
 
 @ImportResource("classpath:memcached.xml")
 @EnableCaching
-public class AdministradorApplication {
+public class AdministradorApplication extends SpringBootServletInitializer {
+
+	public static Logger logger;
 
 	public static void main(String[] args) {
 		SpringApplication.run(AdministradorApplication.class, args);
+		Logger logger1 = getLogger(AdministradorApplication.class);
+
+		logger1.info("hello");
+
+		logger1.error("error");
+		logger1.debug("Debug");
+
+		//logger1.info(SpringApplication.run(AdministradorApplication.class, args));
+
+	}
+
+	@Override
+	protected SpringApplicationBuilder configure(SpringApplicationBuilder builder){
+		return builder.sources(AdministradorApplication.class);
 	}
 
 }

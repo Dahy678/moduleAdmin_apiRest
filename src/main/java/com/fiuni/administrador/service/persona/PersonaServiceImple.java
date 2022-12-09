@@ -10,13 +10,13 @@ import com.fiuni.administrador.utils.Settings;
 import com.library.domainLibrary.domain.persona.PersonaDomain;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.CacheManager;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.util.Optional;
 
 @Service
 public  class PersonaServiceImple extends BaseServiceImpl<PersonaDto ,PersonaDomain ,PersonaResult> implements IPersonaService {
@@ -35,7 +35,7 @@ public  class PersonaServiceImple extends BaseServiceImpl<PersonaDto ,PersonaDom
 
     @Override
     @Transactional
-    public ResponseEntity<PersonaDto> update(Integer id, PersonaDto dto) {
+    public PersonaDto update(Integer id, PersonaDto dto) {
         if (dto.getEstado() != null && dto.getIdRol() != null && dto.getNombre() != null && dto.getCi() != null
                 && dto.getDireccion() !=null && dto.getEmail()!= null && dto.getFechaNacimiento()!=null && dto.getGenero() != null && dto.getPassword()!= null
                 && dto.getTelefono() !=null ) {
@@ -51,13 +51,16 @@ public  class PersonaServiceImple extends BaseServiceImpl<PersonaDto ,PersonaDom
                 personaDomain.setCi(dto.getCi());
                 personaDomain.setPassword(dto.getPassword());
                 dto.setId(personaDomain.getId());
+                cacheManager.getCache(Settings.CACHE_NAME).evictIfPresent("API_PERSONA_" + id);
                 return save(dto);
-            }).orElse(null).getBody();
-            return response != null ? new ResponseEntity<PersonaDto>(HttpStatus.NO_CONTENT)
-                    : new ResponseEntity<>(HttpStatus.CONFLICT);
-
+            }).orElse(null);
+            if(response != null){
+                cacheManager.getCache(Settings.CACHE_NAME).put("API_PERSONA_" + response.getId(), response);
+            }
+            return response;
         }
-        return new ResponseEntity<PersonaDto>(HttpStatus.BAD_REQUEST);
+        return null;
+
     }
 
     @Override
@@ -95,32 +98,35 @@ public  class PersonaServiceImple extends BaseServiceImpl<PersonaDto ,PersonaDom
 
     @Override
     @Transactional
-    public ResponseEntity<PersonaDto> save(PersonaDto dto) {
-        dto.setEstado(dto.getEstado() == null || dto.getEstado());
+    public PersonaDto save(PersonaDto dto) {
+        dto.setEstado(dto.getEstado() == null ? true:  dto.getEstado());
 
         PersonaDto response = convertDomainToDto(personaDao.save(convertDtoToDomain(dto)));
 
-        return response != null ? new ResponseEntity<PersonaDto>(response, HttpStatus.CREATED)
-                : new ResponseEntity<>(HttpStatus.CONFLICT);
+        if(dto.getId() == null){
+            cacheManager.getCache(Settings.CACHE_NAME).put("API_PERSONA_" + response.getId(), response);
+        }
+
+        return response;
     }
 
     @Override
     @Transactional
-   // @Cacheable(value =Settings.CACHE_NAME,key="'api_persona_'+ #id")
-    public ResponseEntity<PersonaDto> getById(Integer id) {
-        PersonaDto response = personaDao.findById(id).map(personaDomain -> convertDomainToDto(personaDomain)).orElse(null);
+    @Cacheable(value =Settings.CACHE_NAME,key="'api_persona_'+ #id")
+    public PersonaDto getById(Integer id) {
+        Optional<PersonaDomain> personaDomain = personaDao.findById(id);
+        PersonaDto response = personaDomain.map(persona -> {
+            return convertDomainToDto(persona);
+        }).orElse(null);
 
-        return response != null ? new ResponseEntity<PersonaDto>(response, HttpStatus.OK)
-                : new ResponseEntity(HttpStatus.NOT_FOUND);
+        return response;
 
     }
+
     @Override
     @Transactional
     public PersonaResult getAll(Pageable pageable) {
-
         Page<PersonaDomain> page = personaDao.getByEstadoTrue(pageable);
-
-
         PersonaResult response = new PersonaResult(page.map(materia -> {
             PersonaDto dto = convertDomainToDto(materia);
             cacheManager.getCache(Settings.CACHE_NAME).putIfAbsent("api_persona_" + dto.getId(), dto);
@@ -152,19 +158,27 @@ public  class PersonaServiceImple extends BaseServiceImpl<PersonaDto ,PersonaDom
 
     @Override
     @Transactional
-    public ResponseEntity<Boolean> delete(Integer id) {
+    public Boolean delete(Integer id) {
         Boolean response = personaDao.findById(id).map(personaDomain -> {
             PersonaDto dto = convertDomainToDto(personaDomain);
             if (dto.getEstado()) {
                 dto.setEstado(false);
                 save(dto);
+
+                PersonaDto respuesta = save(dto);
+                if(respuesta != null){
+                    cacheManager.getCache(Settings.CACHE_NAME).evictIfPresent("API_PERSONA_" + id);
+                }
+
                 return true;
             } else {
                 return false;
             }
         }).orElse(false);
 
-        return new ResponseEntity<Boolean>(response != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
+        return response;
+
+
     }
 
 

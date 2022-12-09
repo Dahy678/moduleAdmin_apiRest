@@ -7,10 +7,10 @@ import org.springframework.http.ResponseEntity;
 
 public interface IRolService extends IBaseService <RolDto, RolResult> {
 
-    public abstract ResponseEntity<RolDto> update(Integer id, RolDto dto);
+    public abstract RolDto update(Integer id, RolDto dto);
 
     public abstract ResponseEntity<Boolean> delete(Integer id);
 
-    public abstract ResponseEntity<Integer> deleteAbs(Integer id);
+    public abstract Integer deleteAbs(Integer id);
 }
 

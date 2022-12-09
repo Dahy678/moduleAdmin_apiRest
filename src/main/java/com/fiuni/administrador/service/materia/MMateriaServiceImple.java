@@ -61,25 +61,39 @@ public class MMateriaServiceImple extends BaseServiceImpl<MateriaDTO, MateriaDom
 
     @Override
     @Transactional
-    public ResponseEntity<MateriaDTO> save(MateriaDTO dto) {
+    public MateriaDTO save(MateriaDTO dto) {
         dto.setEstado(dto.getEstado() == null ? true : dto.getEstado());
         MateriaDTO response = convertDomainToDto(materiaDao.save(convertDtoToDomain(dto)));
 
+        if(dto.getId() == null){
+            cacheManager.getCache(Settings.CACHE_NAME).put("API_MATERIA_" + response.getId(), response);
+        }
 
-        return response != null ? new ResponseEntity<MateriaDTO>(response, HttpStatus.CREATED)
-                : new ResponseEntity<>(HttpStatus.CONFLICT);
+        return response;
     }
+
+    /*
+       public EtapaDTO save(EtapaDTO dto) {
+        dto.setEstado(dto.getEstado() == null ? true : dto.getEstado());
+        EtapaDomain domain = etapaDao.save(convertDtoToDomain(dto));
+        EtapaDTO response = convertDomainToDto(domain);
+        if(dto.getId() == null){
+            cacheManager.getCache(Settings.CACHE_NAME).put("API_ETAPA_" + response.getId(), response);
+        }
+
+        return response;
+    }
+	}*/
 
     @Override
     @Transactional
-    public ResponseEntity<MateriaDTO> getById(Integer id) {
+    public MateriaDTO getById(Integer id) {
         Optional<MateriaDomain> materiaDomain = materiaDao.findById(id);
         MateriaDTO response = materiaDomain.map(m -> {
             return convertDomainToDto(m);
         }).orElse(null);
 
-        return response != null ? new ResponseEntity(response, HttpStatus.OK)
-                : new ResponseEntity(HttpStatus.NOT_FOUND);
+       return response;
     }
 
 
@@ -106,19 +120,24 @@ public class MMateriaServiceImple extends BaseServiceImpl<MateriaDTO, MateriaDom
 
     @Override
     @Transactional
-    public ResponseEntity<MateriaDTO> update(Integer id, MateriaDTO dto) {
+    public MateriaDTO update(Integer id, MateriaDTO dto) {
         if (dto.getEstado() != null && dto.getNombre() != null) {
             MateriaDTO mActualizada = materiaDao.findById(id).map(materiaDomain -> {
                 materiaDomain.setNombre(dto.getNombre());
                 materiaDomain.setEstado(dto.getEstado());
                 dto.setId(materiaDomain.getId());
                 return save(dto);
-            }).orElse(null).getBody();
-            return (mActualizada != null ? new ResponseEntity(HttpStatus.NO_CONTENT) : new ResponseEntity(HttpStatus.CONFLICT));
+            }).orElse(null);
 
+            if(mActualizada != null){
+                cacheManager.getCache(Settings.CACHE_NAME).put("API_MATERIA_" + mActualizada.getId(), mActualizada);
+            }
+            return mActualizada;
         }
-        return new ResponseEntity<MateriaDTO>(HttpStatus.BAD_REQUEST);
+        return null;
     }
+
+
 
     @Override
     @Transactional
